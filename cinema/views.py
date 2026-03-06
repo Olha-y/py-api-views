@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 
 from cinema.models import Movie, Genre, Actor, CinemaHall
-from cinema.serializer import (
+from cinema.serializers import (
     GenreSerializer,
     ActorSerializer,
     CinemaSerializer
@@ -46,6 +46,14 @@ class GenreDetail(APIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def patch(self, request, pk) -> Response:
+        serializer = GenreSerializer(
+            self.get_object(pk=pk),
+            data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def delete(self, request, pk) -> Response:
         genre = self.get_object(pk=pk)
         genre.delete()
@@ -82,6 +90,9 @@ class ActorDetail(
     def put(self, request, *args, **kwargs) -> Response:
         return self.update(request, *args, **kwargs)
 
+    def patch(self, request, *args, **kwargs) -> Response:
+        return self.partial_update(request, *args, **kwargs)
+
     def delete(self, request, *args, **kwargs) -> Response:
         return self.destroy(request, *args, **kwargs)
 
@@ -90,6 +101,7 @@ class CinemaHallViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
 ):

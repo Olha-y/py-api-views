@@ -8,6 +8,7 @@ class ActorSerializer(serializers.ModelSerializer):
         model = Actor
         fields = ["first_name", "last_name"]
 
+
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre

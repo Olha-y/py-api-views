@@ -1,5 +1,10 @@
 from rest_framework.response import Response
-from rest_framework import status, generics, mixins, viewsets
+from rest_framework import (
+    status,
+    generics,
+    mixins,
+    viewsets
+)
 
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
@@ -8,9 +13,9 @@ from cinema.models import Movie, Genre, Actor, CinemaHall
 from cinema.serializers import (
     GenreSerializer,
     ActorSerializer,
-    CinemaSerializer
+    CinemaHallSerializer,
+    MovieSerializer,
 )
-from cinema.serializers import MovieSerializer
 
 
 class GenreList(APIView):
@@ -49,9 +54,11 @@ class GenreDetail(APIView):
     def patch(self, request, pk) -> Response:
         serializer = GenreSerializer(
             self.get_object(pk=pk),
-            data=request.data
+            data=request.data,
+            partial=True
         )
         serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, pk) -> Response:
@@ -79,7 +86,7 @@ class ActorDetail(
     generics.GenericAPIView,
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
-    mixins.DestroyModelMixin
+    mixins.DestroyModelMixin,
 ):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
@@ -107,7 +114,7 @@ class CinemaHallViewSet(
 ):
 
     queryset = CinemaHall.objects.all()
-    serializer_class = CinemaSerializer
+    serializer_class = CinemaHallSerializer
 
 
 class MovieViewSet(
